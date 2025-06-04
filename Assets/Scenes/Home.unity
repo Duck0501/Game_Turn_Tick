@@ -849,6 +849,70 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1798128053
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1798128055}
+  - component: {fileID: 1798128054}
+  m_Layer: 0
+  m_Name: UI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1798128054
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1798128053}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e9600eb7fa72634d9e9a697737145a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buttonPlay: {fileID: 1659623200}
+  buttonHelp: {fileID: 287154758}
+  buttonToHome: {fileID: 0}
+  buttonReset: {fileID: 0}
+  buttonNext: {fileID: 0}
+  buttonLevel1: {fileID: 0}
+  buttonLevel2: {fileID: 0}
+  buttonLevel3: {fileID: 0}
+  buttonLevel4: {fileID: 0}
+  buttonLevel5: {fileID: 0}
+  buttonLevel6: {fileID: 0}
+  buttonLevel7: {fileID: 0}
+  buttonLevel8: {fileID: 0}
+  buttonLevel9: {fileID: 0}
+  buttonLevel10: {fileID: 0}
+  buttonLevel11: {fileID: 0}
+  buttonLevel12: {fileID: 0}
+  buttonLevel13: {fileID: 0}
+  buttonLevel14: {fileID: 0}
+  buttonLevel15: {fileID: 0}
+--- !u!4 &1798128055
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1798128053}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -4.4092474, y: 0.076722234, z: -0.050526712}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1942455623
 GameObject:
   m_ObjectHideFlags: 0
@@ -946,3 +1010,4 @@ SceneRoots:
   - {fileID: 1942455625}
   - {fileID: 968607878}
   - {fileID: 1632939980}
+  - {fileID: 1798128055}
