@@ -121,6 +121,33 @@ public class UIManager : MonoBehaviour
                             nextLevel = "Level 6";
                             break;
                         case "Level 6":
+                            nextLevel = "Level 7";
+                            break;
+                        case "Level 7":
+                            nextLevel = "Level 8";
+                            break;
+                        case "Level 8":
+                            nextLevel = "Level 9";
+                            break;
+                        case "Level 9":
+                            nextLevel = "Level 10";
+                            break;
+                        case "Level 10":
+                            nextLevel = "Level 11";
+                            break;
+                        case "Level 11":
+                            nextLevel = "Level 12";
+                            break;
+                        case "Level 12":
+                            nextLevel = "Level 13";
+                            break;
+                        case "Level 13":
+                            nextLevel = "Level 14";
+                            break;
+                        case "Level 14":
+                            nextLevel = "Level 15";
+                            break;
+                        case "Level 15":
                             nextLevel = "Home";
                             break;
                         default:

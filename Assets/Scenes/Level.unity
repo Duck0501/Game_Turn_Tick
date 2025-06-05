@@ -3303,6 +3303,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1771711309}
   - component: {fileID: 1771711308}
+  - component: {fileID: 1771711310}
   m_Layer: 0
   m_Name: UI
   m_TagString: Untagged
@@ -3357,6 +3358,34 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1771711310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1771711307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90e2f4916c40b7644ae495fc14febfca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  levelButtons:
+  - {fileID: 1130083525}
+  - {fileID: 1782894151}
+  - {fileID: 1420670459}
+  - {fileID: 523518138}
+  - {fileID: 713707610}
+  - {fileID: 1613693054}
+  - {fileID: 597934105}
+  - {fileID: 1295445677}
+  - {fileID: 1750364143}
+  - {fileID: 1627248455}
+  - {fileID: 682839513}
+  - {fileID: 1313055021}
+  - {fileID: 963764174}
+  - {fileID: 152616959}
+  - {fileID: 2094010368}
 --- !u!1 &1782894149
 GameObject:
   m_ObjectHideFlags: 0
