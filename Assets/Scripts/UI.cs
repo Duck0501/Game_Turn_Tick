@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -9,6 +9,8 @@ public class UIManager : MonoBehaviour
     public Button buttonToHome;
     public Button buttonReset;
     public Button buttonNext;
+    public Button buttonTime;
+    public Button buttonNoTime;
     public Button buttonLevel1;
     public Button buttonLevel2;
     public Button buttonLevel3;
@@ -28,7 +30,7 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         if (buttonPlay != null)
-            buttonPlay.onClick.AddListener(() => SceneManager.LoadScene("Level"));
+            buttonPlay.onClick.AddListener(() => SceneManager.LoadScene("Mode"));
 
         if (buttonHelp != null)
             buttonHelp.onClick.AddListener(() => SceneManager.LoadScene("Help"));
@@ -80,6 +82,20 @@ public class UIManager : MonoBehaviour
 
         if (buttonLevel15 != null)
             buttonLevel15.onClick.AddListener(() => SceneManager.LoadScene("Level 15"));
+
+        if (buttonTime != null)
+            buttonTime.onClick.AddListener(() =>
+            {
+                PlayerPrefs.SetInt("GameMode", 1); // 1 là chế độ Time
+                SceneManager.LoadScene("Level");
+            });
+
+        if (buttonNoTime != null)
+            buttonNoTime.onClick.AddListener(() =>
+            {
+                PlayerPrefs.SetInt("GameMode", 0); // 0 là chế độ No Time
+                SceneManager.LoadScene("Level");
+            });
 
         if (buttonReset != null)
             buttonReset.onClick.AddListener(() =>

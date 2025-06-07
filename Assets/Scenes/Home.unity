@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 287154760}
   - component: {fileID: 287154759}
   - component: {fileID: 287154758}
+  - component: {fileID: 287154761}
   m_Layer: 5
   m_Name: help
   m_TagString: Untagged
@@ -239,6 +240,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 287154756}
   m_CullTransparentMesh: 1
+--- !u!114 &287154761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 287154756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 335c40305adb200488e545f34c3fc0cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scaleFactor: 1.1
+  scaleDuration: 0.2
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -730,6 +745,7 @@ GameObject:
   - component: {fileID: 1659623202}
   - component: {fileID: 1659623201}
   - component: {fileID: 1659623200}
+  - component: {fileID: 1659623203}
   m_Layer: 5
   m_Name: play
   m_TagString: Untagged
@@ -838,6 +854,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1659623198}
   m_CullTransparentMesh: 1
+--- !u!114 &1659623203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1659623198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 335c40305adb200488e545f34c3fc0cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scaleFactor: 1.1
+  scaleDuration: 0.2
 --- !u!1 &1743807383
 GameObject:
   m_ObjectHideFlags: 0
@@ -960,6 +990,8 @@ MonoBehaviour:
   buttonToHome: {fileID: 0}
   buttonReset: {fileID: 0}
   buttonNext: {fileID: 0}
+  buttonTime: {fileID: 0}
+  buttonNoTime: {fileID: 0}
   buttonLevel1: {fileID: 0}
   buttonLevel2: {fileID: 0}
   buttonLevel3: {fileID: 0}
