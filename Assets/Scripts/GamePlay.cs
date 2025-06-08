@@ -17,6 +17,7 @@ public class GamePlay : MonoBehaviour
     [SerializeField] private Sprite defaultCircleSprite; // Sprite mặc định cho hình tròn đặc biệt
     [SerializeField] private Sprite specialCircleSprite; // Sprite đặc biệt cho hình tròn
     [SerializeField] private AudioSource rotateSound; // Âm thanh khi quay
+    [SerializeField] private AudioSource bellSound; // Âm thanh khi chạm chuông
     [SerializeField] private float rotateSpeed = 100f; // Tốc độ xoay (độ/giây)
     [SerializeField] private float stopThreshold = 0.012f; // Ngưỡng để coi là "giữa hình tròn hoặc chuông"
     [SerializeField] private float stopThresholds = 1f;
@@ -343,6 +344,11 @@ public class GamePlay : MonoBehaviour
                     bool currentState = bellSpriteStates.ContainsKey(bell) ? bellSpriteStates[bell] : false;
                     bellSpriteStates[bell] = !currentState;
                     bellSprite.sprite = bellSpriteStates[bell] ? changedSprite : defaultSprite;
+                }
+                // Phát âm thanh chuông
+                if (bellSound != null)
+                {
+                    bellSound.Play();
                 }
                 break; // Thoát vòng lặp sau khi xử lý một chuông
             }
