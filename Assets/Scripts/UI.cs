@@ -1,178 +1,112 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class UIManager : MonoBehaviour
 {
-    public Button buttonPlay;
-    public Button buttonHelp;
-    public Button buttonToHome;
-    public Button buttonReset;
-    public Button buttonNext;
-    public Button buttonTime;
-    public Button buttonNoTime;
-    public Button buttonLevel1;
-    public Button buttonLevel2;
-    public Button buttonLevel3;
-    public Button buttonLevel4;
-    public Button buttonLevel5;
-    public Button buttonLevel6;
-    public Button buttonLevel7;
-    public Button buttonLevel8;
-    public Button buttonLevel9;
-    public Button buttonLevel10;
-    public Button buttonLevel11;
-    public Button buttonLevel12;
-    public Button buttonLevel13;
-    public Button buttonLevel14;
-    public Button buttonLevel15;
+    public Button buttonPlay, buttonHelp, buttonToHome, buttonReset, buttonNext;
+    public Button buttonTime, buttonNoTime;
+    public List<Button> levelButtons;
 
-    void Start()
+    private void Start()
     {
-        if (buttonPlay != null)
-            buttonPlay.onClick.AddListener(() => SceneManager.LoadScene("Mode"));
+        Screen.SetResolution(Display.main.systemWidth, Display.main.systemHeight, true);
 
-        if (buttonHelp != null)
-            buttonHelp.onClick.AddListener(() => SceneManager.LoadScene("Help"));
+        AssignBasicButton(buttonPlay, "Mode");
+        AssignBasicButton(buttonHelp, "Help");
+        AssignBasicButton(buttonToHome, "Home");
 
-        if (buttonToHome != null)
-            buttonToHome.onClick.AddListener(() => SceneManager.LoadScene("Home"));
+        AssignGameModeButton(buttonTime, 1);
+        AssignGameModeButton(buttonNoTime, 0);
 
-        if (buttonLevel1 != null)
-            buttonLevel1.onClick.AddListener(() => SceneManager.LoadScene("Level 1"));
+        AssignResetButton(buttonReset);
+        AssignNextButton(buttonNext);
 
-        if (buttonLevel2 != null)
-            buttonLevel2.onClick.AddListener(() => SceneManager.LoadScene("Level 2"));
+        AssignLevelButtons();
+    }
 
-        if (buttonLevel3 != null)
-            buttonLevel3.onClick.AddListener(() => SceneManager.LoadScene("Level 3"));
+    private void AssignBasicButton(Button button, string sceneName)
+    {
+        if (button != null)
+            button.onClick.AddListener(() => SceneManager.LoadScene(sceneName));
+    }
 
-        if (buttonLevel4 != null)
-            buttonLevel4.onClick.AddListener(() => SceneManager.LoadScene("Level 4"));
-
-        if (buttonLevel5 != null)
-            buttonLevel5.onClick.AddListener(() => SceneManager.LoadScene("Level 5"));
-
-        if (buttonLevel6 != null)
-            buttonLevel6.onClick.AddListener(() => SceneManager.LoadScene("Level 6"));
-
-        if (buttonLevel7 != null)
-            buttonLevel7.onClick.AddListener(() => SceneManager.LoadScene("Level 7"));
-
-        if (buttonLevel8 != null)
-            buttonLevel8.onClick.AddListener(() => SceneManager.LoadScene("Level 8"));
-
-        if (buttonLevel9 != null)
-            buttonLevel9.onClick.AddListener(() => SceneManager.LoadScene("Level 9"));
-
-        if (buttonLevel10 != null)
-            buttonLevel10.onClick.AddListener(() => SceneManager.LoadScene("Level 10"));
-
-        if (buttonLevel11 != null)
-            buttonLevel11.onClick.AddListener(() => SceneManager.LoadScene("Level 11"));
-
-        if (buttonLevel12 != null)
-            buttonLevel12.onClick.AddListener(() => SceneManager.LoadScene("Level 12"));
-
-        if (buttonLevel13 != null)
-            buttonLevel13.onClick.AddListener(() => SceneManager.LoadScene("Level 13"));
-
-        if (buttonLevel14 != null)
-            buttonLevel14.onClick.AddListener(() => SceneManager.LoadScene("Level 14"));
-
-        if (buttonLevel15 != null)
-            buttonLevel15.onClick.AddListener(() => SceneManager.LoadScene("Level 15"));
-
-        if (buttonTime != null)
-            buttonTime.onClick.AddListener(() =>
+    private void AssignGameModeButton(Button button, int mode)
+    {
+        if (button != null)
+        {
+            button.onClick.AddListener(() =>
             {
-                PlayerPrefs.SetInt("GameMode", 1); // 1 là chế độ Time
+                PlayerPrefs.SetInt("GameMode", mode);
                 SceneManager.LoadScene("Level");
             });
+        }
+    }
 
-        if (buttonNoTime != null)
-            buttonNoTime.onClick.AddListener(() =>
+    private void AssignResetButton(Button button)
+    {
+        if (button != null)
+        {
+            button.onClick.AddListener(() =>
             {
-                PlayerPrefs.SetInt("GameMode", 0); // 0 là chế độ No Time
-                SceneManager.LoadScene("Level");
-            });
+                string currentScene = SceneManager.GetActiveScene().name;
 
-        if (buttonReset != null)
-            buttonReset.onClick.AddListener(() =>
-            {
-                if (SceneManager.GetActiveScene().name == "Win" || SceneManager.GetActiveScene().name == "Lose")
+                if (currentScene == "Win" || currentScene == "Lose")
                 {
                     string lastLevel = PlayerPrefs.GetString("LastLevel", "Level 1");
                     SceneManager.LoadScene(lastLevel);
                 }
                 else
                 {
-                    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                    SceneManager.LoadScene(currentScene);
                 }
             });
+        }
+    }
 
-        if (buttonNext != null)
-            buttonNext.onClick.AddListener(() =>
+    private void AssignNextButton(Button button)
+    {
+        if (button != null)
+        {
+            button.onClick.AddListener(() =>
             {
-                if (SceneManager.GetActiveScene().name == "Win")
-                {
-                    string lastLevel = PlayerPrefs.GetString("LastLevel", "Level 1");
-                    string nextLevel;
+                if (SceneManager.GetActiveScene().name != "Win") return;
 
-                    switch (lastLevel)
-                    {
-                        case "Level 1":
-                            nextLevel = "Level 2";
-                            break;
-                        case "Level 2":
-                            nextLevel = "Level 3";
-                            break;
-                        case "Level 3":
-                            nextLevel = "Level 4";
-                            break;
-                        case "Level 4":
-                            nextLevel = "Level 5";
-                            break;
-                        case "Level 5":
-                            nextLevel = "Level 6";
-                            break;
-                        case "Level 6":
-                            nextLevel = "Level 7";
-                            break;
-                        case "Level 7":
-                            nextLevel = "Level 8";
-                            break;
-                        case "Level 8":
-                            nextLevel = "Level 9";
-                            break;
-                        case "Level 9":
-                            nextLevel = "Level 10";
-                            break;
-                        case "Level 10":
-                            nextLevel = "Level 11";
-                            break;
-                        case "Level 11":
-                            nextLevel = "Level 12";
-                            break;
-                        case "Level 12":
-                            nextLevel = "Level 13";
-                            break;
-                        case "Level 13":
-                            nextLevel = "Level 14";
-                            break;
-                        case "Level 14":
-                            nextLevel = "Level 15";
-                            break;
-                        case "Level 15":
-                            nextLevel = "Home";
-                            break;
-                        default:
-                            nextLevel = "Level 1";
-                            break;
-                    }
+                string lastLevel = PlayerPrefs.GetString("LastLevel", "Level 1");
+                string nextLevel = GetNextLevel(lastLevel);
 
-                    SceneManager.LoadScene(nextLevel);
-                }
+                SceneManager.LoadScene(nextLevel);
             });
+        }
+    }
+
+    private void AssignLevelButtons()
+    {
+        for (int i = 0; i < levelButtons.Count; i++)
+        {
+            int levelIndex = i + 1;
+            if (levelButtons[i] != null)
+            {
+                string levelName = $"Level {levelIndex}";
+                levelButtons[i].onClick.AddListener(() => SceneManager.LoadScene(levelName));
+            }
+        }
+    }
+
+    private string GetNextLevel(string currentLevel)
+    {
+        if (currentLevel.StartsWith("Level "))
+        {
+            int levelNumber;
+            if (int.TryParse(currentLevel.Substring(6), out levelNumber))
+            {
+                if (levelNumber >= 1 && levelNumber < 15)
+                    return $"Level {levelNumber + 1}";
+                else
+                    return "Home";
+            }
+        }
+        return "Level 1";
     }
 }

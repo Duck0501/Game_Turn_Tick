@@ -160,13 +160,20 @@ MonoBehaviour:
   - {fileID: 1709209075}
   - {fileID: 195495851}
   bells: []
+  specialCircles:
+  - {fileID: 1382485315}
+  - {fileID: 1709209076}
   defaultSprite: {fileID: 0}
   changedSprite: {fileID: 0}
   defaultCircleSprite: {fileID: -5905358785927170718, guid: 616ace89012500c4ca2ad66547a5cffa, type: 3}
   specialCircleSprite: {fileID: -8527568592950175283, guid: 629d8f87c262bd64ca1e8995b1418474, type: 3}
   rotateSound: {fileID: 62762120}
-  rotateSpeed: 110
-  stopThreshold: 0.012
+  bellSound: {fileID: 0}
+  timerImage: {fileID: 1156785860}
+  timerText: {fileID: 324351968}
+  timeLimit: 30
+  rotateSpeed: 120
+  stopThreshold: 0.0162
   stopThresholds: 0.1
   angleTolerance: 175
   positionTolerance: 0.1
@@ -174,12 +181,7 @@ MonoBehaviour:
   trailFadeDuration: 0.5
   blackBarSprite: {fileID: 740663368}
   afterimageColor: {r: 1, g: 1, b: 1, a: 0.5}
-  timerImage: {fileID: 1156785860}
-  timerText: {fileID: 324351968}
-  timeLimit: 30
-  specialCircles:
-  - {fileID: 1382485315}
-  - {fileID: 1709209076}
+  poolSize: 50
   specialCircleInitialStates: 0001
   bellInitialStates: 
 --- !u!4 &62762119
@@ -191,7 +193,7 @@ Transform:
   m_GameObject: {fileID: 62762117}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.99971855, y: 1.4712946, z: -0.010616558}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -834,21 +836,7 @@ MonoBehaviour:
   buttonNext: {fileID: 0}
   buttonTime: {fileID: 0}
   buttonNoTime: {fileID: 0}
-  buttonLevel1: {fileID: 0}
-  buttonLevel2: {fileID: 0}
-  buttonLevel3: {fileID: 0}
-  buttonLevel4: {fileID: 0}
-  buttonLevel5: {fileID: 0}
-  buttonLevel6: {fileID: 0}
-  buttonLevel7: {fileID: 0}
-  buttonLevel8: {fileID: 0}
-  buttonLevel9: {fileID: 0}
-  buttonLevel10: {fileID: 0}
-  buttonLevel11: {fileID: 0}
-  buttonLevel12: {fileID: 0}
-  buttonLevel13: {fileID: 0}
-  buttonLevel14: {fileID: 0}
-  buttonLevel15: {fileID: 0}
+  levelButtons: []
 --- !u!4 &882938006
 Transform:
   m_ObjectHideFlags: 0
@@ -878,7 +866,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7189960325779628326, guid: 22843d6bebc421d41bb84fcbbc8908cc, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.226
+      value: -1.22
       objectReference: {fileID: 0}
     - target: {fileID: 7189960325779628326, guid: 22843d6bebc421d41bb84fcbbc8908cc, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1302,7 +1290,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7189960325779628326, guid: 22843d6bebc421d41bb84fcbbc8908cc, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.1865
+      value: 0.19
       objectReference: {fileID: 0}
     - target: {fileID: 7189960325779628326, guid: 22843d6bebc421d41bb84fcbbc8908cc, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1456,11 +1444,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7189960325779628326, guid: 22843d6bebc421d41bb84fcbbc8908cc, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.182
+      value: 0.1885
       objectReference: {fileID: 0}
     - target: {fileID: 7189960325779628326, guid: 22843d6bebc421d41bb84fcbbc8908cc, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.609375
+      value: 1.608
       objectReference: {fileID: 0}
     - target: {fileID: 7189960325779628326, guid: 22843d6bebc421d41bb84fcbbc8908cc, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1788,9 +1776,9 @@ MonoBehaviour:
   m_UiScaleMode: 0
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1080, y: 1920}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96

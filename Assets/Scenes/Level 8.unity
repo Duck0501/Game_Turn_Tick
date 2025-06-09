@@ -1059,14 +1059,18 @@ MonoBehaviour:
   - {fileID: 1546772223}
   bells:
   - {fileID: 949274876}
+  specialCircles: []
   defaultSprite: {fileID: -5677401064782792405, guid: fddc0b097ed15514eaf45fc6f93209fd, type: 3}
   changedSprite: {fileID: -2638100095779062246, guid: df05f8993fefcc44b84111616fa4ac7d, type: 3}
   defaultCircleSprite: {fileID: 0}
   specialCircleSprite: {fileID: 0}
   rotateSound: {fileID: 1745862229}
   bellSound: {fileID: 1745862230}
-  rotateSpeed: 110
-  stopThreshold: 0.012
+  timerImage: {fileID: 181137574}
+  timerText: {fileID: 328608816}
+  timeLimit: 30
+  rotateSpeed: 120
+  stopThreshold: 0.01625
   stopThresholds: 0.1
   angleTolerance: 175
   positionTolerance: 0.1
@@ -1074,10 +1078,7 @@ MonoBehaviour:
   trailFadeDuration: 0.5
   blackBarSprite: {fileID: 816603671}
   afterimageColor: {r: 1, g: 1, b: 1, a: 0.5}
-  timerImage: {fileID: 181137574}
-  timerText: {fileID: 328608816}
-  timeLimit: 30
-  specialCircles: []
+  poolSize: 50
   specialCircleInitialStates: 
   bellInitialStates: 
 --- !u!82 &1745862229
@@ -1595,21 +1596,7 @@ MonoBehaviour:
   buttonNext: {fileID: 0}
   buttonTime: {fileID: 0}
   buttonNoTime: {fileID: 0}
-  buttonLevel1: {fileID: 0}
-  buttonLevel2: {fileID: 0}
-  buttonLevel3: {fileID: 0}
-  buttonLevel4: {fileID: 0}
-  buttonLevel5: {fileID: 0}
-  buttonLevel6: {fileID: 0}
-  buttonLevel7: {fileID: 0}
-  buttonLevel8: {fileID: 0}
-  buttonLevel9: {fileID: 0}
-  buttonLevel10: {fileID: 0}
-  buttonLevel11: {fileID: 0}
-  buttonLevel12: {fileID: 0}
-  buttonLevel13: {fileID: 0}
-  buttonLevel14: {fileID: 0}
-  buttonLevel15: {fileID: 0}
+  levelButtons: []
 --- !u!4 &1962821843
 Transform:
   m_ObjectHideFlags: 0
@@ -1676,9 +1663,9 @@ MonoBehaviour:
   m_UiScaleMode: 0
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1080, y: 1920}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96

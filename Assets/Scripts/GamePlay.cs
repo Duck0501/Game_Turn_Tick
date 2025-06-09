@@ -6,252 +6,214 @@ using UnityEngine.UI;
 
 public class GamePlay : MonoBehaviour
 {
-    [SerializeField] private Transform blackBar; // Thanh đen
-    [SerializeField] private Transform greenBar; // Thanh xanh (mục tiêu)
-    [SerializeField] private Transform pivot1;   // Chấm 1
-    [SerializeField] private Transform pivot2;   // Chấm 2
-    [SerializeField] private Transform[] circles; // Danh sách các hình tròn
-    [SerializeField] private GameObject[] bells;  // Danh sách các chuông
-    [SerializeField] private Sprite defaultSprite; // Sprite mặc định cho chuông
-    [SerializeField] private Sprite changedSprite; // Sprite khi đi qua chuông
-    [SerializeField] private Sprite defaultCircleSprite; // Sprite mặc định cho hình tròn đặc biệt
-    [SerializeField] private Sprite specialCircleSprite; // Sprite đặc biệt cho hình tròn
-    [SerializeField] private AudioSource rotateSound; // Âm thanh khi quay
-    [SerializeField] private AudioSource bellSound; // Âm thanh khi chạm chuông
-    [SerializeField] private float rotateSpeed = 100f; // Tốc độ xoay (độ/giây)
-    [SerializeField] private float stopThreshold = 0.012f; // Ngưỡng để coi là "giữa hình tròn hoặc chuông"
-    [SerializeField] private float stopThresholds = 1f;
-    [SerializeField] private float angleTolerance = 1f; // Sai số góc để kiểm tra trùng khớp
-    [SerializeField] private float positionTolerance = 0.1f;
-    [SerializeField] private float bellPassDelay = 1f; // Thời gian tối thiểu giữa các lần đổi sprite (1 giây)
-    [SerializeField] private float trailFadeDuration = 0.5f; // Thời gian fade ra của trail khi dừng
-    [SerializeField] private SpriteRenderer blackBarSprite; // SpriteRenderer của thanh đen
-    [SerializeField] private Color afterimageColor = new Color(1f, 1f, 1f, 0.5f); // Màu bóng mờ
-    [SerializeField] private Image timerImage; // Hình ảnh hiển thị trong chế độ Time
-    [SerializeField] private Text timerText; // Văn bản hiển thị thời gian đếm ngược
-    [SerializeField] private float timeLimit = 30f; // Thời gian đếm ngược (giây)
-    [SerializeField] private List<GameObject> specialCircles; // Danh sách các GameObject hình tròn đặc biệt
-    [SerializeField] private List<bool> specialCircleInitialStates; // Trạng thái sprite ban đầu cho hình tròn đặc biệt
-    [SerializeField] private List<bool> bellInitialStates; // Trạng thái sprite ban đầu cho chuông (true: changedSprite, false: defaultSprite)
+    [Header("Bars and Pivots")]
+    [SerializeField] private Transform blackBar, greenBar, pivot1, pivot2;
 
-    private Transform currentPivot; // Trọng tâm hiện tại
-    private bool isRotating = false;
-    private int bellPassCount = 0; // Đếm số lần đi qua chuông (giữ lại nhưng không dùng để đổi sprite)
-    private float lastBellPassTime = -1f; // Thời điểm lần đi qua chuông cuối cùng
-    private bool gameEnded = false;
-    private Queue<GameObject> afterImagePool = new Queue<GameObject>(); // Pool cho bóng mờ
-    private int poolSize = 50; // Kích thước pool
-    private bool isTimeMode = false; // Chế độ Time (true) hoặc No Time (false)
-    private float timeRemaining; // Thời gian còn lại trong chế độ Time
-    private bool wasRotatingLastFrame = false; // Trạng thái xoay của khung trước
-    private Dictionary<GameObject, bool> circleSpriteStates = new Dictionary<GameObject, bool>(); // Trạng thái sprite của hình tròn đặc biệt
-    private Dictionary<GameObject, bool> bellSpriteStates = new Dictionary<GameObject, bool>(); // Trạng thái sprite của chuông
+    [Header("Gameplay Elements")]
+    [SerializeField] private Transform[] circles;
+    [SerializeField] private GameObject[] bells;
+    [SerializeField] private List<GameObject> specialCircles;
+
+    [Header("Sprites")]
+    [SerializeField] private Sprite defaultSprite, changedSprite;
+    [SerializeField] private Sprite defaultCircleSprite, specialCircleSprite;
+
+    [Header("Audio")]
+    [SerializeField] private AudioSource rotateSound, bellSound;
+
+    [Header("UI")]
+    [SerializeField] private Image timerImage;
+    [SerializeField] private Text timerText;
+
+    [Header("Timing & Settings")]
+    [SerializeField] private float timeLimit = 30f;
+    [SerializeField] private float rotateSpeed = 120f;
+    [SerializeField] private float stopThreshold = 0.012f;
+    [SerializeField] private float stopThresholds = 1f;
+    [SerializeField] private float angleTolerance = 1f;
+    [SerializeField] private float positionTolerance = 0.1f;
+    [SerializeField] private float bellPassDelay = 1f;
+    [SerializeField] private float trailFadeDuration = 0.5f;
+
+    [Header("Visual Effects")]
+    [SerializeField] private SpriteRenderer blackBarSprite;
+    [SerializeField] private Color afterimageColor = new Color(1f, 1f, 1f, 0.5f);
+    [SerializeField] private int poolSize = 50;
+
+    [Header("Initial States")]
+    [SerializeField] private List<bool> specialCircleInitialStates;
+    [SerializeField] private List<bool> bellInitialStates;
+
+    private Transform currentPivot;
+    private bool isRotating = false, wasRotatingLastFrame = false, gameEnded = false;
+    private int bellPassCount = 0;
+    private float lastBellPassTime = -1f, timeRemaining;
+    private bool isTimeMode = false;
+
+    private Queue<GameObject> afterImagePool = new Queue<GameObject>();
+    private Dictionary<GameObject, bool> circleSpriteStates = new Dictionary<GameObject, bool>();
+    private Dictionary<GameObject, bool> bellSpriteStates = new Dictionary<GameObject, bool>();
 
     void Start()
     {
-        // Kiểm tra chế độ chơi
-        isTimeMode = PlayerPrefs.GetInt("GameMode", 0) == 0;
-
-        // Khởi tạo thời gian đếm ngược
-        if (isTimeMode)
-        {
-            timeRemaining = timeLimit;
-            if (timerImage != null) timerImage.gameObject.SetActive(true);
-            if (timerText != null) timerText.gameObject.SetActive(true);
-        }
-        else
-        {
-            if (timerImage != null) timerImage.gameObject.SetActive(false);
-            if (timerText != null) timerText.gameObject.SetActive(false);
-        }
-
-        // Đặt âm thanh quay lặp liên tục
-        if (rotateSound != null)
-        {
-            rotateSound.loop = true; // Lặp âm thanh khi quay
-        }
-
-        // Khởi tạo pool cho bóng mờ
-        for (int i = 0; i < poolSize; i++)
-        {
-            GameObject afterImage = new GameObject("AfterImage");
-            afterImage.SetActive(false);
-            SpriteRenderer sr = afterImage.AddComponent<SpriteRenderer>();
-            sr.sprite = blackBarSprite.sprite;
-            sr.sortingOrder = blackBarSprite.sortingOrder - 1;
-            afterImagePool.Enqueue(afterImage);
-        }
-
-        // Khởi tạo trạng thái sprite cho các hình tròn đặc biệt
-        for (int i = 0; i < specialCircles.Count; i++)
-        {
-            GameObject specialCircle = specialCircles[i];
-            if (specialCircle != null)
-            {
-                SpriteRenderer circleSprite = specialCircle.GetComponent<SpriteRenderer>();
-                if (circleSprite != null)
-                {
-                    // Lấy trạng thái ban đầu từ specialCircleInitialStates (nếu có), mặc định là false
-                    bool initialState = i < specialCircleInitialStates.Count ? specialCircleInitialStates[i] : false;
-                    circleSprite.sprite = initialState ? specialCircleSprite : defaultCircleSprite;
-                    circleSpriteStates[specialCircle] = initialState; // Lưu trạng thái ban đầu
-                }
-            }
-        }
-
-        // Khởi tạo trạng thái sprite cho các chuông
-        for (int i = 0; i < bells.Length; i++)
-        {
-            GameObject bell = bells[i];
-            if (bell != null)
-            {
-                SpriteRenderer bellSprite = bell.GetComponent<SpriteRenderer>();
-                if (bellSprite != null)
-                {
-                    // Lấy trạng thái ban đầu từ bellInitialStates (nếu có), mặc định là false
-                    bool initialState = i < bellInitialStates.Count ? bellInitialStates[i] : false;
-                    bellSprite.sprite = initialState ? changedSprite : defaultSprite;
-                    bellSpriteStates[bell] = initialState; // Lưu trạng thái ban đầu
-                }
-            }
-        }
+        SetupGameMode();
+        InitializeAfterImagePool();
+        InitializeSpecialCircles();
+        InitializeBells();
     }
 
     void Update()
     {
         if (gameEnded) return;
 
-        // Cập nhật thời gian đếm ngược trong chế độ Time
-        if (isTimeMode)
-        {
-            timeRemaining -= Time.deltaTime;
-            if (timerText != null)
-            {
-                timerText.text = Mathf.CeilToInt(timeRemaining).ToString();
-            }
-            if (timeRemaining <= 0)
-            {
-                gameEnded = true;
-                PlayerPrefs.SetString("LastLevel", SceneManager.GetActiveScene().name);
-                SceneManager.LoadScene("Lose");
-                return;
-            }
-        }
-
-        // Phát hiện chuột nhấn vào chấm
-        if (Input.GetMouseButtonDown(0))
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
-
-            if (hit.collider != null)
-            {
-                Transform clickedPivot = null;
-                if (hit.collider.transform == pivot1)
-                {
-                    clickedPivot = pivot1;
-                }
-                else if (hit.collider.transform == pivot2)
-                {
-                    clickedPivot = pivot2;
-                }
-
-                // Kiểm tra nếu chấm được nhấn nằm giữa hình tròn thì đặt làm trọng tâm và xoay
-                if (clickedPivot != null && IsPivotInCircle(clickedPivot))
-                {
-                    currentPivot = clickedPivot;
-                    isRotating = true;
-                    if (rotateSound != null) rotateSound.Play();
-                }
-            }
-        }
-
-        // Kiểm tra khi bắt đầu xoay để đổi sprite các hình tròn đặc biệt
-        if (isRotating && !wasRotatingLastFrame)
-        {
-            foreach (GameObject specialCircle in specialCircles)
-            {
-                if (specialCircle != null)
-                {
-                    float distanceToPivot = Vector2.Distance(currentPivot.position, specialCircle.transform.position);
-                    if (distanceToPivot >= stopThreshold)
-                    {
-                        UpdateSpecialCircleSprite(specialCircle);
-                    }
-                }
-            }
-        }
-
-        // Xoay thanh đen theo chiều kim đồng hồ
-        if (isRotating && currentPivot != null)
-        {
-            float rotation = rotateSpeed * Time.deltaTime;
-            blackBar.RotateAround(currentPivot.position, Vector3.forward, -rotation); // Dấu "-" để xoay theo chiều kim đồng hồ
-
-            // Tạo bóng mờ
-            CreateAfterImage();
-
-            // Kiểm tra nếu chấm không phải trọng tâm nằm giữa một trong các hình tròn thì dừng
-            CheckCircleAlignment();
-
-            // Kiểm tra nếu chấm đi qua chuông
-            CheckBellPass();
-        }
-        else
-        {
-            // Dừng âm thanh quay khi không xoay
-            if (rotateSound != null && rotateSound.isPlaying)
-            {
-                rotateSound.Stop();
-            }
-        }
-
-        // Cập nhật trạng thái xoay cho khung tiếp theo
-        wasRotatingLastFrame = isRotating;
-
-        // Kiểm tra xem thanh đen có trùng với thanh xanh không
+        HandleTimer();
+        HandleMouseInput();
+        HandleRotation();
         CheckWinCondition();
     }
 
-    // Tạo hiệu ứng bóng mờ
-    private void CreateAfterImage()
+    private void SetupGameMode()
     {
-        if (afterImagePool != null && afterImagePool.Count > 0)
-        {
-            GameObject afterImage = afterImagePool.Dequeue();
-            afterImage.SetActive(true);
-            afterImage.transform.position = blackBar.position;
-            afterImage.transform.rotation = blackBar.rotation;
-            afterImage.transform.localScale = blackBar.localScale;
-            SpriteRenderer sr = afterImage.GetComponent<SpriteRenderer>();
-            sr.color = afterimageColor;
+        isTimeMode = PlayerPrefs.GetInt("GameMode", 0) == 0;
+        timeRemaining = timeLimit;
+        timerImage?.gameObject.SetActive(isTimeMode);
+        timerText?.gameObject.SetActive(isTimeMode);
 
-            // Fade bóng mờ và đưa lại vào pool
-            sr.DOFade(0f, trailFadeDuration).OnComplete(() =>
-            {
-                afterImage.SetActive(false);
-                afterImagePool.Enqueue(afterImage);
-            });
+        if (rotateSound != null) rotateSound.loop = true;
+    }
+
+    private void InitializeAfterImagePool()
+    {
+        for (int i = 0; i < poolSize; i++)
+        {
+            GameObject afterImage = new GameObject("AfterImage");
+            afterImage.SetActive(false);
+            var sr = afterImage.AddComponent<SpriteRenderer>();
+            sr.sprite = blackBarSprite.sprite;
+            sr.sortingOrder = blackBarSprite.sortingOrder - 1;
+            afterImagePool.Enqueue(afterImage);
         }
     }
 
-    // Kiểm tra nếu chấm nằm giữa một trong các hình tròn
+    private void InitializeSpecialCircles()
+    {
+        for (int i = 0; i < specialCircles.Count; i++)
+        {
+            var circle = specialCircles[i];
+            if (!circle) continue;
+
+            var sr = circle.GetComponent<SpriteRenderer>();
+            if (!sr) continue;
+
+            bool initialState = i < specialCircleInitialStates.Count && specialCircleInitialStates[i];
+            sr.sprite = initialState ? specialCircleSprite : defaultCircleSprite;
+            circleSpriteStates[circle] = initialState;
+        }
+    }
+
+    private void InitializeBells()
+    {
+        for (int i = 0; i < bells.Length; i++)
+        {
+            var bell = bells[i];
+            if (!bell) continue;
+
+            var sr = bell.GetComponent<SpriteRenderer>();
+            if (!sr) continue;
+
+            bool initialState = i < bellInitialStates.Count && bellInitialStates[i];
+            sr.sprite = initialState ? changedSprite : defaultSprite;
+            bellSpriteStates[bell] = initialState;
+        }
+    }
+
+    private void HandleTimer()
+    {
+        if (!isTimeMode) return;
+
+        timeRemaining -= Time.deltaTime;
+        timerText.text = Mathf.CeilToInt(timeRemaining).ToString();
+
+        if (timeRemaining <= 0)
+        {
+            gameEnded = true;
+            PlayerPrefs.SetString("LastLevel", SceneManager.GetActiveScene().name);
+            SceneManager.LoadScene("Lose");
+        }
+    }
+
+    private void HandleMouseInput()
+    {
+        if (!Input.GetMouseButtonDown(0)) return;
+
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
+        if (!hit.collider) return;
+
+        Transform clicked = hit.collider.transform;
+        if (clicked == pivot1 || clicked == pivot2)
+        {
+            if (IsPivotInCircle(clicked))
+            {
+                currentPivot = clicked;
+                isRotating = true;
+                rotateSound?.Play();
+            }
+        }
+    }
+
+    private void HandleRotation()
+    {
+        if (isRotating && !wasRotatingLastFrame)
+        {
+            foreach (var circle in specialCircles)
+                if (circle && Vector2.Distance(currentPivot.position, circle.transform.position) >= stopThreshold)
+                    UpdateSpecialCircleSprite(circle);
+        }
+
+        if (isRotating && currentPivot != null)
+        {
+            blackBar.RotateAround(currentPivot.position, Vector3.forward, -rotateSpeed * Time.deltaTime);
+            CreateAfterImage();
+            CheckCircleAlignment();
+            CheckBellPass();
+        }
+        else if (rotateSound?.isPlaying == true)
+        {
+            rotateSound.Stop();
+        }
+
+        wasRotatingLastFrame = isRotating;
+    }
+
+    private void CreateAfterImage()
+    {
+        if (afterImagePool.Count == 0) return;
+
+        GameObject afterImage = afterImagePool.Dequeue();
+        afterImage.SetActive(true);
+        afterImage.transform.SetPositionAndRotation(blackBar.position, blackBar.rotation);
+        afterImage.transform.localScale = blackBar.localScale;
+        var sr = afterImage.GetComponent<SpriteRenderer>();
+        sr.color = afterimageColor;
+
+        sr.DOFade(0f, trailFadeDuration).OnComplete(() => {
+            afterImage.SetActive(false);
+            afterImagePool.Enqueue(afterImage);
+        });
+    }
+
     private bool IsPivotInCircle(Transform pivot)
     {
-        for (int i = 0; i < circles.Length; i++)
+        foreach (var circle in circles)
         {
-            Transform circle = circles[i];
-            float distance = Vector2.Distance(pivot.position, circle.position);
-            if (distance < stopThreshold)
+            float dist = Vector2.Distance(pivot.position, circle.position);
+            if (dist < stopThreshold)
             {
-                GameObject circleObj = circle.gameObject;
-                if (specialCircles.Contains(circleObj))
+                if (specialCircles.Contains(circle.gameObject))
                 {
-                    SpriteRenderer circleSprite = circleObj.GetComponent<SpriteRenderer>();
-                    if (circleSprite != null && circleSprite.sprite != defaultCircleSprite)
-                    {
-                        return false; // Không cho phép dừng nếu sprite không phải mặc định
-                    }
+                    var sr = circle.GetComponent<SpriteRenderer>();
+                    if (sr && sr.sprite != defaultCircleSprite) return false;
                 }
                 return true;
             }
@@ -259,167 +221,99 @@ public class GamePlay : MonoBehaviour
         return false;
     }
 
-    // Kiểm tra nếu chấm không phải trọng tâm nằm giữa một trong các hình tròn thì dừng
     private void CheckCircleAlignment()
     {
-        for (int i = 0; i < circles.Length; i++)
+        foreach (var circle in circles)
         {
-            Transform circle = circles[i];
-            float distanceToCircle1 = Vector2.Distance(pivot1.position, circle.position);
-            float distanceToCircle2 = Vector2.Distance(pivot2.position, circle.position);
-
-            // Nếu chấm 1 không phải trọng tâm và nằm giữa hình tròn
-            if (currentPivot != pivot1 && distanceToCircle1 < stopThreshold)
+            if ((currentPivot != pivot1 && (pivot1.position - circle.position).sqrMagnitude < stopThreshold * stopThreshold) ||
+                (currentPivot != pivot2 && (pivot2.position - circle.position).sqrMagnitude < stopThreshold * stopThreshold))
             {
-                GameObject circleObj = circle.gameObject;
-                if (specialCircles.Contains(circleObj))
+                if (specialCircles.Contains(circle.gameObject))
                 {
-                    SpriteRenderer circleSprite = circleObj.GetComponent<SpriteRenderer>();
-                    if (circleSprite != null && circleSprite.sprite != defaultCircleSprite)
-                    {
-                        continue; // Bỏ qua hình tròn đặc biệt nếu sprite không phải mặc định
-                    }
+                    var sr = circle.GetComponent<SpriteRenderer>();
+                    if (sr && sr.sprite != defaultCircleSprite) continue;
                 }
                 isRotating = false;
-                currentPivot = pivot1; // Chuyển trọng tâm sang chấm 1
-                break;
-            }
-            // Nếu chấm 2 không phải trọng tâm và nằm giữa hình tròn
-            else if (currentPivot != pivot2 && distanceToCircle2 < stopThreshold)
-            {
-                GameObject circleObj = circle.gameObject;
-                if (specialCircles.Contains(circleObj))
-                {
-                    SpriteRenderer circleSprite = circleObj.GetComponent<SpriteRenderer>();
-                    if (circleSprite != null && circleSprite.sprite != defaultCircleSprite)
-                    {
-                        continue; // Bỏ qua hình tròn đặc biệt nếu sprite không phải mặc định
-                    }
-                }
-                isRotating = false;
-                currentPivot = pivot2; // Chuyển trọng tâm sang chấm 2
+                currentPivot = (currentPivot == pivot1) ? pivot2 : pivot1;
                 break;
             }
         }
     }
 
-    // Cập nhật sprite hình tròn đặc biệt
     private void UpdateSpecialCircleSprite(GameObject specialCircle)
     {
-        if (specialCircle == null) return;
+        if (!specialCircle) return;
 
-        SpriteRenderer circleSprite = specialCircle.GetComponent<SpriteRenderer>();
-        if (circleSprite != null)
-        {
-            bool currentState = circleSpriteStates.ContainsKey(specialCircle) ? circleSpriteStates[specialCircle] : false;
-            circleSpriteStates[specialCircle] = !currentState; // Toggle trạng thái
-            circleSprite.sprite = circleSpriteStates[specialCircle] ? specialCircleSprite : defaultCircleSprite;
-        }
+        var sr = specialCircle.GetComponent<SpriteRenderer>();
+        if (!sr) return;
+
+        bool state = circleSpriteStates.TryGetValue(specialCircle, out bool val) ? val : false;
+        state = !state;
+        sr.sprite = state ? specialCircleSprite : defaultCircleSprite;
+        circleSpriteStates[specialCircle] = state;
     }
 
-    // Kiểm tra nếu chấm đi qua chuông
     private void CheckBellPass()
     {
-        if (bells.Length == 0) return; // Không có chuông trong scene, thoát sớm
-
-        // Kiểm tra nếu đã đủ thời gian từ lần đổi sprite trước
         if (Time.time - lastBellPassTime < bellPassDelay) return;
 
-        foreach (GameObject bell in bells)
+        foreach (var bell in bells)
         {
-            if (bell == null) continue; // Bỏ qua nếu chuông không tồn tại
+            if (!bell) continue;
 
-            float distanceToPivot1 = Vector2.Distance(pivot1.position, bell.transform.position);
-            float distanceToPivot2 = Vector2.Distance(pivot2.position, bell.transform.position);
-
-            // Nếu chấm 1 hoặc chấm 2 đi qua chuông
-            if (distanceToPivot1 < stopThresholds || distanceToPivot2 < stopThresholds)
+            if (Vector2.Distance(pivot1.position, bell.transform.position) < stopThresholds ||
+                Vector2.Distance(pivot2.position, bell.transform.position) < stopThresholds)
             {
-                bellPassCount++; // Tăng số lần đi qua (giữ lại nhưng không dùng để đổi sprite)
-                lastBellPassTime = Time.time; // Cập nhật thời điểm
-                SpriteRenderer bellSprite = bell.GetComponent<SpriteRenderer>();
-                if (bellSprite != null)
+                bellPassCount++;
+                lastBellPassTime = Time.time;
+
+                var sr = bell.GetComponent<SpriteRenderer>();
+                if (sr)
                 {
-                    // Toggle trạng thái sprite của chuông này
-                    bool currentState = bellSpriteStates.ContainsKey(bell) ? bellSpriteStates[bell] : false;
-                    bellSpriteStates[bell] = !currentState;
-                    bellSprite.sprite = bellSpriteStates[bell] ? changedSprite : defaultSprite;
+                    bool state = bellSpriteStates.TryGetValue(bell, out bool val) ? val : false;
+                    state = !state;
+                    sr.sprite = state ? changedSprite : defaultSprite;
+                    bellSpriteStates[bell] = state;
                 }
-                // Phát âm thanh chuông
-                if (bellSound != null)
-                {
-                    bellSound.Play();
-                }
-                break; // Thoát vòng lặp sau khi xử lý một chuông
+
+                bellSound?.Play();
+                break;
             }
         }
     }
 
-    // Kiểm tra điều kiện thắng
     private void CheckWinCondition()
     {
-        // Kiểm tra góc
-        float angleDifference = Mathf.DeltaAngle(blackBar.rotation.eulerAngles.z, greenBar.rotation.eulerAngles.z);
-        bool isAngleMatched = Mathf.Abs(angleDifference) < angleTolerance;
+        bool angleMatch = Mathf.Abs(Mathf.DeltaAngle(blackBar.rotation.eulerAngles.z, greenBar.rotation.eulerAngles.z)) < angleTolerance;
+        bool positionMatch = Vector3.Distance(blackBar.position, greenBar.position) < positionTolerance;
 
-        // Kiểm tra vị trí
-        float positionDifference = Vector3.Distance(blackBar.position, greenBar.position);
-        bool isPositionMatched = positionDifference < positionTolerance;
-
-        // Nếu scene có chuông, cần tất cả chuông ở trạng thái changedSprite để thắng
-        if (bells.Length > 0)
+        bool bellsPassed = true;
+        foreach (var bell in bells)
         {
-            bool allBellsChanged = true;
-            foreach (GameObject bell in bells)
+            var sr = bell?.GetComponent<SpriteRenderer>();
+            if (sr && sr.sprite != changedSprite)
             {
-                if (bell != null)
-                {
-                    SpriteRenderer bellSprite = bell.GetComponent<SpriteRenderer>();
-                    if (bellSprite != null && bellSprite.sprite != changedSprite)
-                    {
-                        allBellsChanged = false;
-                        break;
-                    }
-                }
-            }
-            if (isAngleMatched && isPositionMatched && allBellsChanged)
-            {
-                gameEnded = true;
-                string currentLevel = SceneManager.GetActiveScene().name;
-                PlayerPrefs.SetString("LastLevel", currentLevel);
-                if (isTimeMode)
-                {
-                    PlayerPrefs.SetFloat("Score", timeRemaining); // Lưu thời gian còn lại làm điểm
-                    string highScoreKey = "HighScore_" + currentLevel;
-                    float highScore = PlayerPrefs.GetFloat(highScoreKey, 0f);
-                    if (timeRemaining > highScore)
-                    {
-                        PlayerPrefs.SetFloat(highScoreKey, timeRemaining); // Cập nhật điểm cao nhất cho level
-                    }
-                }
-                SceneManager.LoadScene("Win");
+                bellsPassed = false;
+                break;
             }
         }
-        // Nếu scene không có chuông, chỉ cần góc và vị trí khớp
-        else
+
+        if (angleMatch && positionMatch && (bells.Length == 0 || bellsPassed))
         {
-            if (isAngleMatched && isPositionMatched)
+            gameEnded = true;
+            string level = SceneManager.GetActiveScene().name;
+            PlayerPrefs.SetString("LastLevel", level);
+
+            if (isTimeMode)
             {
-                gameEnded = true;
-                string currentLevel = SceneManager.GetActiveScene().name;
-                PlayerPrefs.SetString("LastLevel", currentLevel);
-                if (isTimeMode)
-                {
-                    PlayerPrefs.SetFloat("Score", timeRemaining); // Lưu thời gian còn lại làm điểm
-                    string highScoreKey = "HighScore_" + currentLevel;
-                    float highScore = PlayerPrefs.GetFloat(highScoreKey, 0f);
-                    if (timeRemaining > highScore)
-                    {
-                        PlayerPrefs.SetFloat(highScoreKey, timeRemaining); // Cập nhật điểm cao nhất cho level
-                    }
-                }
-                SceneManager.LoadScene("Win");
+                PlayerPrefs.SetFloat("Score", timeRemaining);
+                string key = "HighScore_" + level;
+                float prevHigh = PlayerPrefs.GetFloat(key, 0);
+                if (timeRemaining > prevHigh)
+                    PlayerPrefs.SetFloat(key, timeRemaining);
             }
+
+            SceneManager.LoadScene("Win");
         }
     }
 }
